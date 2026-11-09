@@ -13,6 +13,8 @@
 #include "pico/multicore.h"
 #include "pico/cyw43_arch.h"
 
+#include "can.h"
+
 int count = 0;
 bool on = false;
 
@@ -47,6 +49,9 @@ int main( void )
     const char *rtos_name;
     rtos_name = "FreeRTOS";
     TaskHandle_t task;
+
+    canbus_setup();
+
     xTaskCreate(main_task, "MainThread",
                 MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &task);
     vTaskStartScheduler();
