@@ -36,13 +36,17 @@ void main_task(__unused void *params) {
     xTaskCreate(blink_task, "BlinkThread",
                 BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
 
+    uint8_t tx_data[8] = "A";
+    uint32_t id = 0xAA;
     struct can2040_msg msg = {0};
     struct can2040_stats can_stats = {0};
 
     while (1) {
-        if (xQueueReceive(rx_queue, &msg, portMAX_DELAY) == pdPASS) {
-            printf("Message: %s\n", msg.data);
-        }
+        can_tx(&cbus, id, 8, tx_data);
+
+        // if (xQueueReceive(rx_queue, &msg, portMAX_DELAY) == pdPASS) {
+        //     printf("Message: %s\n", msg.data);
+        // }
 
         can2040_get_statistics(&cbus, &can_stats);
         printf("CAN stats - tx_attempts: %d, tx_total: %d, rx_total: %d, parse_error: %d\n",

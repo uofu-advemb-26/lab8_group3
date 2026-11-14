@@ -9,11 +9,11 @@
 #define CAN_STANDBY_PIN 16  // Bottom right
 
 extern struct can2040 cbus;
-extern struct can2040_msg can_message;
 extern QueueHandle_t rx_queue;
 
 static void can2040_cb(struct can2040 *cd, uint32_t notify, struct can2040_msg *msg);
 static void PIOx_IRQHandler(void);
 void canbus_setup(void);
+int can_tx(struct can2040 *can_bus, uint32_t id, uint32_t dlc, uint8_t data[]);
 
 #endif	// _CAN_H

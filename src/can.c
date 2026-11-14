@@ -3,6 +3,7 @@
 #include <hardware/regs/intctrl.h>
 #include <pico/stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 struct can2040 cbus = {0};
 QueueHandle_t rx_queue;
@@ -15,6 +16,29 @@ static void can2040_cb(struct can2040 *cd, uint32_t notify, struct can2040_msg *
 static void PIOx_IRQHandler(void)
 {
     can2040_pio_irq_handler(&cbus);
+}
+
+int can_tx(struct can2040 *can_bus, uint32_t id, uint32_t dlc, uint8_t data[])
+{
+    struct can2040_msg msg = {0};
+    msg.id = id;
+    msg.dlc = dlc;
+    memcpy(msg.data, data, 8);
+
+    int result = can2040_check_transmit(&cbus);
+    if (result) {
+        printf("Check transmit succeeded\n");
+    }
+    else {
+        printf("Check transmit failed %d\n", result);
+    }
+
+    result = can2040_transmit(&cbus, &msg);
+
+    if (result)
+        printf("Failed to transmit (%d)\n", result);
+
+    return result;
 }
 
 void canbus_setup(void)
