@@ -55,7 +55,7 @@ void main_task(__unused void *params) {
                can_stats.rx_total,
                can_stats.parse_error);
 
-        //vTaskDelay(1000);
+        vTaskDelay(1000);
     }
 }
 
