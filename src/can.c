@@ -4,9 +4,12 @@
 #include <pico/stdlib.h>
 #include <stdio.h>
 
+struct can2040 cbus = {0};
+QueueHandle_t rx_queue;
+
 static void can2040_cb(struct can2040 *cd, uint32_t notify, struct can2040_msg *msg)
 {
-    printf("Recieved: %s", msg->data);
+    xQueueSend(rx_queue, msg, portMAX_DELAY);
 }
 
 static void PIOx_IRQHandler(void)
@@ -19,6 +22,8 @@ void canbus_setup(void)
     uint32_t pio_num = 0;
     uint32_t sys_clock = 125000000, bitrate = 500000;
     uint32_t gpio_rx = CAN_RX_PIN, gpio_tx = CAN_TX_PIN;
+
+    rx_queue = xQueueCreate(100, sizeof(struct can2040_msg));
 
     // Setup canbus
     can2040_setup(&cbus, pio_num);

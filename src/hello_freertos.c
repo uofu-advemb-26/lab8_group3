@@ -35,11 +35,22 @@ void blink_task(__unused void *params) {
 void main_task(__unused void *params) {
     xTaskCreate(blink_task, "BlinkThread",
                 BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
-    char c;
-    while(c = getchar()) {
-        if (c <= 'z' && c >= 'a') putchar(c - 32);
-        else if (c >= 'A' && c <= 'Z') putchar(c + 32);
-        else putchar(c);
+
+    struct can2040_msg msg = {0};
+    struct can2040_stats can_stats = {0};
+
+    while (1) {
+        if (xQueueReceive(rx_queue, &msg, portMAX_DELAY) == pdPASS)
+            printf("Message: 0x%X\n", msg.data[0]);
+
+        can2040_get_statistics(&cbus, &can_stats);
+        printf("CAN stats - tx_attempts: %d, tx_total: %d, rx_total: %d, parse_error: %d\n",
+               can_stats.tx_attempt,
+               can_stats.tx_total,
+               can_stats.rx_total,
+               can_stats.parse_error);
+
+        vTaskDelay(1000);
     }
 }
 
