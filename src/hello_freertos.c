@@ -40,8 +40,9 @@ void main_task(__unused void *params) {
     struct can2040_stats can_stats = {0};
 
     while (1) {
-        if (xQueueReceive(rx_queue, &msg, portMAX_DELAY) == pdPASS)
-            printf("Message: 0x%X\n", msg.data[0]);
+        if (xQueueReceive(rx_queue, &msg, portMAX_DELAY) == pdPASS) {
+            printf("Message: %s\n", msg.data);
+        }
 
         can2040_get_statistics(&cbus, &can_stats);
         printf("CAN stats - tx_attempts: %d, tx_total: %d, rx_total: %d, parse_error: %d\n",
@@ -50,7 +51,7 @@ void main_task(__unused void *params) {
                can_stats.rx_total,
                can_stats.parse_error);
 
-        vTaskDelay(1000);
+        //vTaskDelay(1000);
     }
 }
 
