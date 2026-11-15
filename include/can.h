@@ -8,6 +8,15 @@
 #define CAN_RX_PIN 2        // 2nd top right
 #define CAN_STANDBY_PIN 16  // Bottom right
 
+#define HIGH_PRIORITY_MSG "A"
+#define HIGH_PRIORITY_ID 0x00
+
+#define LOW_PRIORITY_MSG "B"
+#define LOW_PRIORITY_ID 0xFF
+
+#define CAN_MESSAGE HIGH_PRIORITY_MSG
+#define CAN_ID HIGH_PRIORITY_ID
+
 extern struct can2040 cbus;
 extern QueueHandle_t rx_queue;
 
