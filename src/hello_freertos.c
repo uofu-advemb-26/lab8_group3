@@ -18,9 +18,11 @@
 int count = 0;
 bool on = false;
 
-#define MAIN_TASK_PRIORITY      ( tskIDLE_PRIORITY + 1UL )
+#define TX_TASK_PRIORITY      ( tskIDLE_PRIORITY + 1UL )
+#define RX_TASK_PRIORITY      ( tskIDLE_PRIORITY + 1UL )
 #define BLINK_TASK_PRIORITY     ( tskIDLE_PRIORITY + 2UL )
-#define MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
+#define TX_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
+#define RX_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 #define BLINK_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 
 void blink_task(__unused void *params) {
@@ -32,30 +34,24 @@ void blink_task(__unused void *params) {
     }
 }
 
-void main_task(__unused void *params) {
-    xTaskCreate(blink_task, "BlinkThread",
-                BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
+void tx_task(__unused void *params) {
 
     uint8_t tx_data[8] = "A";
     uint32_t id = 0xAA;
+
+    while (1) {
+        can_tx(&cbus, id, 8, tx_data);
+    }
+}
+
+void rx_task(__unused void *params) {
     struct can2040_msg msg = {0};
     struct can2040_stats can_stats = {0};
 
     while (1) {
-        can_tx(&cbus, id, 8, tx_data);
-
-        // if (xQueueReceive(rx_queue, &msg, portMAX_DELAY) == pdPASS) {
-        //     printf("Message: %s\n", msg.data);
-        // }
-
-        can2040_get_statistics(&cbus, &can_stats);
-        printf("CAN stats - tx_attempts: %d, tx_total: %d, rx_total: %d, parse_error: %d\n",
-               can_stats.tx_attempt,
-               can_stats.tx_total,
-               can_stats.rx_total,
-               can_stats.parse_error);
-
-        vTaskDelay(1000);
+        if (xQueueReceive(rx_queue, &msg, portMAX_DELAY) == pdPASS) {
+            printf("Message: %c\n", msg.data[0]);
+        }
     }
 }
 
@@ -68,8 +64,13 @@ int main( void )
 
     canbus_setup();
 
-    xTaskCreate(main_task, "MainThread",
-                MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &task);
+    xTaskCreate(blink_task, "BlinkThread",
+                BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
+    xTaskCreate(tx_task, "TXThread",
+                TX_TASK_STACK_SIZE, NULL, TX_TASK_PRIORITY, &task);
+    xTaskCreate(rx_task, "RXThread",
+                RX_TASK_STACK_SIZE, NULL, RX_TASK_PRIORITY, &task);
+
     vTaskStartScheduler();
     return 0;
 }
