@@ -37,10 +37,11 @@ void blink_task(__unused void *params) {
 void tx_task(__unused void *params) {
 
     uint8_t tx_data[8] = "A";
-    uint32_t id = 0xAA;
+    uint32_t id = 0x1FF;
 
     while (1) {
         can_tx(&cbus, id, 8, tx_data);
+        vTaskDelay(1000);
     }
 }
 
@@ -48,9 +49,17 @@ void rx_task(__unused void *params) {
     struct can2040_msg msg = {0};
     struct can2040_stats can_stats = {0};
 
+    uint a = 0;
+    uint b = 0;
+
     while (1) {
         if (xQueueReceive(rx_queue, &msg, portMAX_DELAY) == pdPASS) {
-            printf("Message: %c\n", msg.data[0]);
+            if (msg.data[0] == 'A')
+                a++;
+            else
+                b++;
+
+            printf("Message: %c, A: %d, B:%d\n", msg.data[0], a, b);
         }
     }
 }
