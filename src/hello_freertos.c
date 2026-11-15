@@ -70,27 +70,17 @@ int main( void )
     stdio_init_all();
     const char *rtos_name;
     rtos_name = "FreeRTOS";
-<<<<<<< HEAD
     TaskHandle_t r_task;
     TaskHandle_t t_task;
-=======
-    TaskHandle_t r_task, t_task;
->>>>>>> f90c152 (CAN message id config)
 
     canbus_setup();
 
     xTaskCreate(blink_task, "BlinkThread",
                 BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
     xTaskCreate(tx_task, "TXThread",
-<<<<<<< HEAD
-                TX_TASK_STACK_SIZE, NULL, TX_TASK_PRIORITY, &r_task);
-    xTaskCreate(rx_task, "RXThread",
-                RX_TASK_STACK_SIZE, NULL, RX_TASK_PRIORITY, &t_task);
-=======
                 TX_TASK_STACK_SIZE, NULL, TX_TASK_PRIORITY, &t_task);
     xTaskCreate(rx_task, "RXThread",
                 RX_TASK_STACK_SIZE, NULL, RX_TASK_PRIORITY, &r_task);
->>>>>>> f90c152 (CAN message id config)
 
     vTaskStartScheduler();
     return 0;
