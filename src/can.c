@@ -11,7 +11,7 @@ QueueHandle_t rx_queue;
 static void can2040_cb(struct can2040 *cd, uint32_t notify, struct can2040_msg *msg)
 {
     if (!xQueueIsQueueFullFromISR(rx_queue))
-        xQueueSend(rx_queue, msg, portMAX_DELAY);
+        xQueueSendFromISR(rx_queue, msg, NULL);
 }
 
 static void PIOx_IRQHandler(void)

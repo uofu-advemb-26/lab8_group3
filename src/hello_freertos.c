@@ -60,16 +60,17 @@ int main( void )
     stdio_init_all();
     const char *rtos_name;
     rtos_name = "FreeRTOS";
-    TaskHandle_t task;
+    TaskHandle_t r_task;
+    TaskHandle_t t_task;
 
     canbus_setup();
 
     xTaskCreate(blink_task, "BlinkThread",
                 BLINK_TASK_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
     xTaskCreate(tx_task, "TXThread",
-                TX_TASK_STACK_SIZE, NULL, TX_TASK_PRIORITY, &task);
+                TX_TASK_STACK_SIZE, NULL, TX_TASK_PRIORITY, &r_task);
     xTaskCreate(rx_task, "RXThread",
-                RX_TASK_STACK_SIZE, NULL, RX_TASK_PRIORITY, &task);
+                RX_TASK_STACK_SIZE, NULL, RX_TASK_PRIORITY, &t_task);
 
     vTaskStartScheduler();
     return 0;
