@@ -10,7 +10,8 @@ QueueHandle_t rx_queue;
 
 static void can2040_cb(struct can2040 *cd, uint32_t notify, struct can2040_msg *msg)
 {
-    xQueueSend(rx_queue, msg, portMAX_DELAY);
+    if (!xQueueIsQueueFullFromISR(rx_queue))
+        xQueueSend(rx_queue, msg, portMAX_DELAY);
 }
 
 static void PIOx_IRQHandler(void)
@@ -25,18 +26,18 @@ int can_tx(struct can2040 *can_bus, uint32_t id, uint32_t dlc, uint8_t data[])
     msg.dlc = dlc;
     memcpy(msg.data, data, 8);
 
-    int result = can2040_check_transmit(&cbus);
-    if (result) {
-        printf("Check transmit succeeded\n");
-    }
-    else {
-        printf("Check transmit failed %d\n", result);
-    }
+    // int result = can2040_check_transmit(&cbus);
+    // if (result) {
+    //     printf("Check transmit succeeded\n");
+    // }
+    // else {
+    //     printf("Check transmit failed %d\n", result);
+    // }
 
-    result = can2040_transmit(&cbus, &msg);
+    int result = can2040_transmit(&cbus, &msg);
 
-    if (result)
-        printf("Failed to transmit (%d)\n", result);
+    // if (result)
+    //     printf("Failed to transmit (%d)\n", result);
 
     return result;
 }
