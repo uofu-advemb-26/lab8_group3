@@ -37,6 +37,17 @@ if(DEFINED ENV{OPENOCD_PATH})
     set(OPENOCD_PATH $ENV{OPENOCD_PATH})
 endif()
 
+if (DEFINED CAN_PATH)
+# Already defined, e.g. -D flag
+elseif (DEFINED ENV{CAN_PATH})
+# Defined in an environment variable
+    set(CAN_PATH $ENV{CAN_PATH})
+else()
+# Use the submodule
+    set(CAN_PATH lib/can2040)
+endif()
+message("CAN_PATH is '${CAN_PATH}'")
+
 # ====================================================================================
 cmake_minimum_required(VERSION 3.13)
 
@@ -55,6 +66,9 @@ include(${FREERTOS_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.c
 
 # This sets up the unity library. They don't provide a library export, so it's defined locally.
 include(unity.cmake)
+
+# Set up can2040 library
+include(${CAN_PATH}/can2040.cmake)
 
 # This defines your project name, you can name it anything you want.
 project(myproject C CXX ASM)

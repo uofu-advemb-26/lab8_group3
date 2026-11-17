@@ -10,6 +10,7 @@ env:
   OPENOCD_PATH: /usr/share/openocd
   PICO_TOOLCHAIN_PATH: /usr/bin
   picotool_DIR: /usr/local/share/pico/picotool
+  CAN_PATH: /usr/local/share/pico/can2040
 
 jobs:
   build:
